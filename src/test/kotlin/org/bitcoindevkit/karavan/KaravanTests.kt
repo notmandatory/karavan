@@ -1,10 +1,10 @@
-package com.example.bitcoin_multisig_coordinator_server
+package org.bitcoindevkit.karavan
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class BitcoinMultiSigCoordinatorServerApplicationTests {
+class KaravanTests {
 
     @Test
     fun contextLoads() {

@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.10"
 }
 
-group = "com.example"
+group = "org.bitcoindevkit"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -25,6 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.bitcoindevkit:bdk-jvm:0.2.2")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
