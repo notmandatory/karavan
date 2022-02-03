@@ -2,11 +2,10 @@ package org.bitcoindevkit.karavan
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
 import org.bitcoindevkit.*
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @SpringBootApplication
@@ -18,7 +17,7 @@ fun main(args: Array<String>) {
 
 @RestController
 @RequestMapping("/wallet")
-class WalletController() {
+class WalletController(val walletService: WalletService) {
 
     // TODO remove this example
     @GetMapping("/hello/{name}")
@@ -35,19 +34,11 @@ class WalletController() {
         return "hello $name, your new address is $newAddress"
     }
 
-    @PutMapping("/open-wallet")
-    fun setCookie(response: HttpServletResponse, @RequestBody descriptor:String): String? {
-        // create a cookie
-        val cookie = Cookie("wallet", descriptor) // might need to change to springframework cookie instead of java
-        cookie.isHttpOnly = true
+    @PutMapping("/open_wallet")
+    fun openWallet(response: HttpServletResponse, request: HttpServletRequest, @RequestBody payload: Wallet): String? {
 
-        //add cookie to response
-        response.addCookie(cookie)
-        return "Wallet Value Set!"
+        walletService.openWallet(response, payload)
+        return walletService.readCookie(request, "wallet")
     }
 
-    @GetMapping("/read-cookie")
-    fun readCookie(@CookieValue(value = "wallet", defaultValue = "na") descriptor: String): String? {
-        return "My wallet value is $descriptor"
-    }
 }
