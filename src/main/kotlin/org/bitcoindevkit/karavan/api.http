@@ -1,0 +1,31 @@
+###
+PUT http://localhost:8080/wallet
+Content-Type: application/json
+
+{
+  "network": "testnet",
+  "descriptor": "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)"
+}
+
+###
+DELETE http://localhost:8080/wallet
+
+###
+GET http://localhost:8080/wallet/getBalance
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
