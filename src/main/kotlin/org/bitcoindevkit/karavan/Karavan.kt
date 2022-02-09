@@ -31,8 +31,7 @@ class WalletController(val walletService: WalletService) {
     fun openWallet(response: HttpServletResponse, request: HttpServletRequest, @RequestBody payload: Wallet): String? {
         // stores payload of type wallet into a cookie on the client's side
         setCookie(response, payload)
-        // read cookie with key 'wallet' to confirm value
-        return readAllCookies(request)
+        return "Wallet is Opened!"
     }
 
     // Close wallet by dropping existing descriptor cookie by setting max-age to 0
@@ -41,6 +40,7 @@ class WalletController(val walletService: WalletService) {
 
         val cookie = WebUtils.getCookie(request!!, "descriptor")
         return if (cookie != null) {
+            // set maxAge property of cookie to 0 - this expires the cookie
             cookie.maxAge = 0
             "Wallet is Closed!"
         } else {
@@ -49,12 +49,12 @@ class WalletController(val walletService: WalletService) {
     }
 
     // Get the wallet's balance
-    // Use the browser cookie to get the network and descriptor and then sync
+    // Use the browser cookie to get the network and descriptor and then syncing wallet
     // return a balance json with the balance amount.
     @GetMapping("/balance")
     fun getBalance(request: HttpServletRequest): String{
 
-        // Retrieve wallet cookies and check if they are null before we proceed
+        // Retrieve wallet cookies and check if they are null before we call getBalance from walletService
         val descCookie = WebUtils.getCookie(request, "descriptor")
         val networkCookie = WebUtils.getCookie(request, "network")
 
@@ -65,16 +65,20 @@ class WalletController(val walletService: WalletService) {
         val descriptor = descCookie.value
         val network = networkCookie.value
 
+        // Call getBalance from WalletService class to process logic and return balance JSON
         return walletService.getBalance(descriptor, network)
     }
 
     // Store wallet object into client's cookie session
     fun setCookie(response: HttpServletResponse, walletIn: Wallet) {
 
-        // create cookie key-value pairs for every wallet data member and set HTTP Only property to true
+        // create cookie key-value pairs for every wallet data member
         for (dataMember in Wallet::class.memberProperties) {
             val cookie = Cookie(dataMember.name, dataMember.get(walletIn) as String?)
+            // set httpOnly to true so cookie can only be accessed by server (to prevent XSS attacks)
             cookie.isHttpOnly = true
+            // set cookie scope to "/wallet"
+            cookie.path = "/wallet"
             response.addCookie(cookie)
         }
     }
