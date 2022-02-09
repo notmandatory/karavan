@@ -50,8 +50,8 @@ class WalletController(val walletService: WalletService) {
 
     // Get the wallet's balance
     // Use the browser cookie to get the network and descriptor and then sync
-    // the wallet and get_balance. Will return a balance json with the balance amount.
-    @GetMapping("/getBalance")
+    // return a balance json with the balance amount.
+    @GetMapping("/balance")
     fun getBalance(request: HttpServletRequest): String{
 
         // Retrieve wallet cookies and check if they are null before we proceed
