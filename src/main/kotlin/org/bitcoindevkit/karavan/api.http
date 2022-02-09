@@ -10,6 +10,8 @@ Content-Type: application/json
 ###
 DELETE http://localhost:8080/wallet
 
+###
+GET http://localhost:8080/wallet/getBalance
 
 
 
