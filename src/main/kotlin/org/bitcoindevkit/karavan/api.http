@@ -1,4 +1,11 @@
 ###
+curl -j -b /tmp/cookie-jar.txt -c /tmp/cookie-jar.txt -X PUT --location "http://localhost:8080/wallet" \
+    -H "Content-Type: application/json" \
+    -d "{
+          \"network\": \"testnet\",
+          \"descriptor\": \"wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)\"
+        }"
+###
 PUT http://localhost:8080/wallet
 Content-Type: application/json
 
@@ -8,10 +15,18 @@ Content-Type: application/json
 }
 
 ###
+curl -b /tmp/cookie-jar.txt -c /tmp/cookie-jar.txt -X DELETE --location "http://localhost:8080/wallet"
+###
 DELETE http://localhost:8080/wallet
 
 ###
+curl -b /tmp/cookie-jar.txt -X GET --location "http://localhost:8080/wallet/balance"
+###
 GET http://localhost:8080/wallet/balance
+
+
+
+
 
 
 

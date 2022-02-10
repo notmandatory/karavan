@@ -31,7 +31,7 @@ class WalletController(val walletService: WalletService) {
     fun openWallet(response: HttpServletResponse, request: HttpServletRequest, @RequestBody payload: Wallet): String? {
         // stores payload of type wallet into a cookie on the client's side
         setCookie(response, payload)
-        return "Wallet is opened!"
+        return "Wallet is opened!\n"
     }
 
     // Close wallet by dropping existing descriptor cookie
@@ -40,10 +40,10 @@ class WalletController(val walletService: WalletService) {
 
         val cookie = WebUtils.getCookie(request!!, "descriptor")
         return if (cookie == null) {
-            "Wallet not found!"
+            "Wallet not found!\n"
         }
         else if(cookie.value.isNullOrEmpty()){
-            "Wallet already closed!"
+            "Wallet already closed!\n"
         }
         else {
             // In order to delete a cookie, we must replicate it, set its maxAge to 0 and add it to response
@@ -52,7 +52,7 @@ class WalletController(val walletService: WalletService) {
             cookieReplacement.isHttpOnly = true
             cookie.maxAge = 0
             response.addCookie(cookieReplacement)
-            "Wallet is closed!"
+            "Wallet is closed!\n"
         }
     }
 
@@ -68,18 +68,18 @@ class WalletController(val walletService: WalletService) {
 
         // check if cookies are null
         if (descCookie == null || networkCookie == null){
-            return "Wallet not found."
+            return "Wallet not found.\n"
         }
         // check if cookie values are dropped
         if (descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
-            return "Wallet is closed, cannot get balance!"
+            return "Wallet is closed, cannot get balance!\n"
         }
 
         val descriptor = descCookie.value
         val network = networkCookie.value
 
         // Call getBalance from WalletService class to process logic and return balance JSON
-        return walletService.getBalance(descriptor, network)
+        return walletService.getBalance(descriptor, network) + "\n"
     }
 
     // Store wallet object into client's cookie session
@@ -100,9 +100,9 @@ class WalletController(val walletService: WalletService) {
     fun readCookie(request: HttpServletRequest?, key: String): String? {
         val cookie = WebUtils.getCookie(request!!, key)
         return if (cookie != null) {
-            "Wallet value is ${cookie.value}"
+            "Wallet value is ${cookie.value}\n"
         } else {
-            "Wallet not found!"
+            "Wallet not found!\n"
         }
     }
 
@@ -114,7 +114,7 @@ class WalletController(val walletService: WalletService) {
             Arrays.stream(cookies)
                 .map { c -> c.getName() + "=" + c.getValue() }.collect(Collectors.joining(", "))
         } else {
-            "No cookies"
+            "No cookies\n"
         }
     }
 
