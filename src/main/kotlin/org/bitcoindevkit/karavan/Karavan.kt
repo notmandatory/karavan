@@ -1,8 +1,5 @@
 package org.bitcoindevkit.karavan
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
-import org.bitcoindevkit.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.web.bind.annotation.*
@@ -36,22 +33,23 @@ class WalletController(val walletService: WalletService) {
 
     // Close wallet by dropping existing descriptor cookie
     @DeleteMapping
-    fun closeWallet(response: HttpServletResponse, request: HttpServletRequest?): String?{
+    fun closeWallet(response: HttpServletResponse, request: HttpServletRequest): String{
 
-        val cookie = WebUtils.getCookie(request!!, "descriptor")
-        return if (cookie == null) {
+        // Retrieve all cookies from request
+        val cookies = request.cookies
+
+        return if (cookies == null) {
             "Wallet not found!\n"
-        }
-        else if(cookie.value.isNullOrEmpty()){
-            "Wallet already closed!\n"
         }
         else {
             // In order to delete a cookie, we must replicate it, set its maxAge to 0 and add it to response
-            val cookieReplacement = Cookie(cookie.name, null)
-            cookieReplacement.path = "/wallet"
-            cookieReplacement.isHttpOnly = true
-            cookie.maxAge = 0
-            response.addCookie(cookieReplacement)
+            for(cookie in cookies) {
+                val cookieReplacement = Cookie(cookie.name, null)
+                cookieReplacement.path = "/wallet"
+                cookieReplacement.isHttpOnly = true
+                cookie.maxAge = 0
+                response.addCookie(cookieReplacement)
+            }
             "Wallet is closed!\n"
         }
     }
@@ -66,13 +64,9 @@ class WalletController(val walletService: WalletService) {
         val descCookie = WebUtils.getCookie(request, "descriptor")
         val networkCookie = WebUtils.getCookie(request, "network")
 
-        // check if cookies are null
-        if (descCookie == null || networkCookie == null){
+        // check if cookies are null or dropped
+        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
             return "Wallet not found.\n"
-        }
-        // check if cookie values are dropped
-        if (descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
-            return "Wallet is closed, cannot get balance!\n"
         }
 
         val descriptor = descCookie.value
