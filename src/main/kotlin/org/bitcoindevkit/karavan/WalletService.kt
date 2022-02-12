@@ -43,7 +43,7 @@ class WalletService {
             )
         val wallet = OnlineWallet(descriptor, null, network, db, client)
 
-        // Sync balance of descriptor
+        // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
 
         // get the balance
