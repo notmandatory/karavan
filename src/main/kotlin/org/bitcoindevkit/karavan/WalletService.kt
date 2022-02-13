@@ -58,6 +58,35 @@ class WalletService {
         return balanceJSONString
     }
 
+    // Connect to Electrum network, sync wallet, and return new address in string.
+    fun getNewAddress(descriptor: String, networkIn: String): String{
+
+        val db = DatabaseConfig.Memory("")
+        val network : Network
+        val newAddress : String
+
+        // Check if valid network
+        if (networkIn.equals("TESTNET", ignoreCase = true))
+            network = Network.TESTNET
+        else
+            return "Invalid Network: $networkIn!"
+
+        // Connecting to Electrum network
+        val client =
+            BlockchainConfig.Electrum(
+                ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
+            )
+        val wallet = OnlineWallet(descriptor, null, network, db, client)
+
+        // sync balance of descriptor
+        wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
+
+        // get a new address
+        newAddress = wallet.getNewAddress()
+
+        return newAddress
+    }
+
     // Return wallet object as JSON
     fun WalletToJSON(walletIn: Wallet): String{
         val mapper = jacksonObjectMapper()
