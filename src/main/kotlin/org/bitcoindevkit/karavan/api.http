@@ -24,8 +24,15 @@ curl -b /tmp/cookie-jar.txt -X GET --location "http://localhost:8080/wallet/bala
 ###
 GET http://localhost:8080/wallet/balance
 
+###
+curl -b /tmp/cookie-jar.txt -X GET --location "http://localhost:8080/wallet/balance"
+###
+GET http://localhost:8080/wallet/address/new
 
-
+###
+curl -b /tmp/cookie-jar.txt -X GET --location "http://localhost:8080/wallet/transactions"
+###
+GET http://localhost:8080/wallet/transactions
 
 
 
