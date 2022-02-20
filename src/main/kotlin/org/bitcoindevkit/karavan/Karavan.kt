@@ -54,25 +54,6 @@ class WalletController(val walletService: WalletService) {
         }
     }
 
-    @GetMapping("/address/new")
-    fun getNewAddress(request: HttpServletRequest): String{
-
-        // Retrieve wallet cookies
-        val descCookie = WebUtils.getCookie(request, "descriptor")
-        val networkCookie = WebUtils.getCookie(request, "network")
-
-        // check if cookies are null or dropped
-        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
-            return "Wallet not found.\n"
-        }
-
-        val descriptor = descCookie.value
-        val network = networkCookie.value
-
-        // Call getNewAddress function and return a new address in string format.
-        return walletService.getNewAddress(descriptor, network) + "\n"
-    }
-
     // Get the wallet's balance
     // Use the browser cookie to get the network and descriptor and then syncing wallet
     // return a balance json with the balance amount.
@@ -93,6 +74,44 @@ class WalletController(val walletService: WalletService) {
 
         // Call getBalance from WalletService class to process logic and return balance JSON
         return walletService.getBalance(descriptor, network) + "\n"
+    }
+
+    @GetMapping("/address/new")
+    fun getNewAddress(request: HttpServletRequest): String{
+
+        // Retrieve wallet cookies
+        val descCookie = WebUtils.getCookie(request, "descriptor")
+        val networkCookie = WebUtils.getCookie(request, "network")
+
+        // check if cookies are null or dropped
+        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
+            return "Wallet not found.\n"
+        }
+
+        val descriptor = descCookie.value
+        val network = networkCookie.value
+
+        // Call getNewAddress function and return a new address in string format.
+        return walletService.getNewAddress(descriptor, network) + "\n"
+    }
+
+    @GetMapping("/transactions")
+    fun getTransactions(request: HttpServletRequest): String{
+
+        // Retrieve wallet cookies
+        val descCookie = WebUtils.getCookie(request, "descriptor")
+        val networkCookie = WebUtils.getCookie(request, "network")
+
+        // check if cookies are null or dropped
+        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
+            return "Wallet not found.\n"
+        }
+
+        val descriptor = descCookie.value
+        val network = networkCookie.value
+
+        // Call getTransactions from WalletService class to process logic and return list of transactions in JSON format
+        return walletService.getTransactions(descriptor, network) + "\n"
     }
 
     // Store wallet object into client's cookie session
