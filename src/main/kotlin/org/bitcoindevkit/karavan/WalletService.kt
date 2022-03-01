@@ -41,7 +41,7 @@ class WalletService {
             BlockchainConfig.Electrum(
                 ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
             )
-        val wallet = OnlineWallet(descriptor, null, network, db, client)
+        val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
@@ -76,7 +76,7 @@ class WalletService {
             BlockchainConfig.Electrum(
                 ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
             )
-        val wallet = OnlineWallet(descriptor, null, network, db, client)
+        val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
@@ -105,7 +105,7 @@ class WalletService {
             BlockchainConfig.Electrum(
                 ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
             )
-        val wallet = OnlineWallet(descriptor, null, network, db, client)
+        val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
