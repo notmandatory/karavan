@@ -35,6 +35,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation ("io.mockk:mockk:1.9.3")
+    implementation("org.bitcoindevkit:bdk-jvm:0.4.0")
+    implementation("org.bitcoindevkit:bdk-jvm:0.3.2")
 }
 
 tasks.withType<KotlinCompile> {
