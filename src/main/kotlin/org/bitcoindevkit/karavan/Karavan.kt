@@ -128,6 +128,44 @@ class WalletController(val walletService: WalletService) {
         return walletService.getTransactions(descriptor, network) + "\n"
     }
 
+    // @TODO Create a function to validate parameter values
+    @GetMapping("/transaction")
+    fun createPSBT(request: HttpServletRequest, @RequestParam(value = "recipient") recipient: String, @RequestParam(value = "amount") amount: ULong,
+                   @RequestParam(value = "fee_rate") fee_rate: Float): String{
+
+        // Retrieve wallet cookies
+        val descCookie = WebUtils.getCookie(request, "descriptor")
+        val networkCookie = WebUtils.getCookie(request, "network")
+
+        // check if cookies are null or dropped
+        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
+            return "Wallet not found.\n"
+        }
+
+        val descriptor = descCookie.value
+        val network = networkCookie.value
+
+        return walletService.createUnsignedPSBT(descriptor, network, recipient, amount, fee_rate)
+    }
+
+    @PutMapping("/broadcast")
+    fun broadcast(request: HttpServletRequest, @RequestBody payload: String): String{
+
+        // Retrieve wallet cookies
+        val descCookie = WebUtils.getCookie(request, "descriptor")
+        val networkCookie = WebUtils.getCookie(request, "network")
+
+        // check if cookies are null or dropped
+        if (descCookie == null || networkCookie == null || descCookie.value.isNullOrEmpty() || networkCookie.value.isNullOrEmpty()){
+            return "Wallet not found.\n"
+        }
+
+        val descriptor = descCookie.value
+        val network = networkCookie.value
+
+        return walletService.broadcastSignedPSBT(descriptor, network, payload)
+    }
+
     // Store wallet object into client's cookie session
     fun setCookie(response: HttpServletResponse, walletIn: Wallet) {
 
