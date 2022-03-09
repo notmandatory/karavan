@@ -3,12 +3,6 @@ package org.bitcoindevkit.karavan
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.CookieValue
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.util.WebUtils
-import javax.servlet.http.Cookie
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 import com.fasterxml.jackson.module.kotlin.*
 import org.bitcoindevkit.*
 
@@ -16,17 +10,37 @@ import org.bitcoindevkit.*
 @Service
 class WalletService {
 
+    private val db = DatabaseConfig.Memory("")
+    // Connecting to Electrum network
+    private val electrumURL = "ssl://electrum.blockstream.info:60002"
+    private val client =
+        BlockchainConfig.Electrum(
+            ElectrumConfig(electrumURL, null, 5u, null, 10u)
+        )
+
     // Create null object of type BdkProgress
     // update() function is changed to do nothing
-    object NullProgress : BdkProgress {
+    private object NullProgress : BdkProgress {
         override fun update(progress: Float, message: String?) {}
+    }
+
+    private val transactionCompByHeight =  Comparator<Transaction> { a, b ->
+        val aHeight = when(a) {
+            is Transaction.Confirmed -> a.confirmation.height
+            else -> null
+        }
+        val bHeight = when(b) {
+            is Transaction.Confirmed -> b.confirmation.height
+            else -> null
+        }
+        compareValues(aHeight,bHeight)
     }
 
 
     // Connect to Electrum network, sync wallet, and return balance as JSON
     fun getBalance(descriptor: String, networkIn: String): String{
 
-        val db = DatabaseConfig.Memory("")
+
         val network : Network
         val balance : ULong
 
@@ -36,16 +50,10 @@ class WalletService {
         else
             return "Invalid Network: $networkIn!"
 
-        // Connecting to Electrum network
-        val client =
-            BlockchainConfig.Electrum(
-                ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
-            )
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-
         // get the balance
         balance = wallet.getBalance()
 
@@ -61,7 +69,6 @@ class WalletService {
     // Connect to Electrum network, sync wallet, and return new address in string.
     fun getNewAddress(descriptor: String, networkIn: String): String{
 
-        val db = DatabaseConfig.Memory("")
         val network : Network
         val newAddress : String
 
@@ -71,16 +78,10 @@ class WalletService {
         else
             return "Invalid Network: $networkIn!"
 
-        // Connecting to Electrum network
-        val client =
-            BlockchainConfig.Electrum(
-                ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
-            )
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-
         // get a new address
         newAddress = wallet.getNewAddress()
 
@@ -88,11 +89,9 @@ class WalletService {
     }
 
     // Return list of transactions in JSON format
-    fun getTransactions(descriptor: String, networkIn: String): String{
+    fun getTransactions(descriptor: String, networkIn: String): String {
 
-        val db = DatabaseConfig.Memory("")
-        val network : Network
-        val balance : ULong
+        val network: Network
 
         // Check if valid network
         if (networkIn.equals("TESTNET", ignoreCase = true))
@@ -100,23 +99,51 @@ class WalletService {
         else
             return "Invalid Network: $networkIn!"
 
-        // Connecting to Electrum network
-        val client =
-            BlockchainConfig.Electrum(
-                ElectrumConfig("ssl://electrum.blockstream.info:60002", null, 5u, null, 10u)
-            )
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-
         // get transactions
         val transactionList = wallet.getTransactions()
+        val transactionSorted = transactionList.sortedWith(transactionCompByHeight)
 
         // map transactionList of Transaction objects into JSON using Jackson
         val mapper = jacksonObjectMapper()
-        var transactionsInJSON : String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transactionList)
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transactionSorted)
+    }
 
-        return transactionsInJSON
+    fun createUnsignedPSBT(descriptor: String, networkIn: String, recipient: String, amount: ULong, feeRate: Float?) : String {
+
+        val network: Network
+        // Check if valid network
+        if (networkIn.equals("TESTNET", ignoreCase = true))
+            network = Network.TESTNET
+        else
+            return "Invalid Network: $networkIn!"
+
+
+        val wallet = Wallet(descriptor, null, network, db, client)
+        wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
+        val psbt = PartiallySignedBitcoinTransaction(wallet, recipient, amount, feeRate)
+        return psbt.serialize()
+    }
+
+    fun broadcastSignedPSBT(descriptor: String, networkIn: String, psbtSerialized: String) : String {
+
+        val network: Network
+        // Check if valid network
+        if (networkIn.equals("TESTNET", ignoreCase = true))
+            network = Network.TESTNET
+        else
+            return "Invalid Network: $networkIn!"
+
+        val wallet = Wallet(descriptor, null, network, db, client)
+        val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
+        wallet.sign(psbt)
+
+        val transaction = wallet.broadcast(psbt)
+        // map transaction of Transaction type into JSON using Jackson and return it
+        val mapper = jacksonObjectMapper()
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transaction)
     }
 }
