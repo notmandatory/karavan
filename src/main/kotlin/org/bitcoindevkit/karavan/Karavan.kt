@@ -26,8 +26,9 @@ fun main(args: Array<String>) {
 class CorsConfiguration : WebMvcConfigurer { // Needed to allow requests from the frontend
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("*")
+            .allowedOrigins("http://localhost:3000")
             .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS")
+            .allowCredentials(true)
     }
 }
 
@@ -56,6 +57,7 @@ class WalletController(val walletService: WalletService) {
         else {
             // In order to delete a cookie, we must replicate it, set its maxAge to 0 and add it to response
             for(cookie in cookies) {
+                if (cookie.value == "") return "Please specify a wallet to close"
                 val cookieReplacement = Cookie(cookie.name, null)
                 cookieReplacement.path = "/wallet"
                 cookieReplacement.isHttpOnly = true
