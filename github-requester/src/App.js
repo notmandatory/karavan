@@ -6,6 +6,7 @@ class App extends Component {
         super()
         this.handleClickOpen = this.handleClickOpen.bind(this)
     }
+
     render () {//show buttons to click on
         return (
             <div className='button__container'>
@@ -22,11 +23,11 @@ class App extends Component {
             "network": "testnet",
             "descriptor": "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)"
         }
-        axios.put('http://localhost:8080/wallet', data)
+        axios.put('http://localhost:8080/wallet', data, {withCredentials: true})
             .then(response => console.log(response)) //print wallet request
     }
     handleClickClose () {
-        axios.delete('http://localhost:8080/wallet').then(response => console.log(response))
+        axios.delete('http://localhost:8080/wallet', {withCredentials: true}).then(response => console.log(response))
         //this doesn't work, cookies not stored on system
     }
 }
