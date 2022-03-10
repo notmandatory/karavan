@@ -18,6 +18,8 @@ class WalletService {
             ElectrumConfig(electrumURL, null, 5u, null, 10u)
         )
 
+    private lateinit var encryptedPSBT : String
+
     // Create null object of type BdkProgress
     // update() function is changed to do nothing
     private object NullProgress : BdkProgress {
@@ -39,7 +41,6 @@ class WalletService {
 
     // Connect to Electrum network, sync wallet, and return balance as JSON
     fun getBalance(descriptor: String, networkIn: String): String{
-
 
         val network : Network
         val balance : ULong
@@ -125,7 +126,9 @@ class WalletService {
         val wallet = Wallet(descriptor, null, network, db, client)
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
         val psbt = PartiallySignedBitcoinTransaction(wallet, recipient, amount, feeRate)
-        return psbt.serialize()
+        val psbtSerialized = psbt.serialize()
+        encryptedPSBT = psbtSerialized
+        return psbtSerialized
     }
 
     fun broadcastSignedPSBT(descriptor: String, networkIn: String, psbtSerialized: String) : String {
@@ -138,11 +141,15 @@ class WalletService {
             return "Invalid Network: $networkIn!"
 
         val wallet = Wallet(descriptor, null, network, db, client)
-        val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
+        //val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
+        //wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
+        println("Encrypted PSBT: \n$encryptedPSBT")
+        val psbt = PartiallySignedBitcoinTransaction.deserialize(encryptedPSBT)
 
         wallet.sign(psbt)
 
         val transaction = wallet.broadcast(psbt)
+
         // map transaction of Transaction type into JSON using Jackson and return it
         val mapper = jacksonObjectMapper()
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transaction)
