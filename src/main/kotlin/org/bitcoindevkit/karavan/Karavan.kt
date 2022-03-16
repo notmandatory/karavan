@@ -163,8 +163,6 @@ class WalletController(val walletService: WalletService) {
         val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
-        println("payload: \n$payload")
-
         return walletService.broadcastSignedPSBT(descriptor, network, payload)
     }
 
