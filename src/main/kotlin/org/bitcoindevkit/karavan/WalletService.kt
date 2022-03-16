@@ -140,8 +140,10 @@ class WalletService {
 
         val wallet = Wallet(descriptor, null, network, db, client)
 
+        println("PSBT Serialized: \n$psbtSerialized")
+
         val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
-        //wallet.sign(psbt)
+        wallet.sign(psbt)
 
         val transaction = wallet.broadcast(psbt)
 
