@@ -69,7 +69,7 @@ class WalletController(val walletService: WalletService) {
             return "Wallet not found.\n"
         }
 
-        val descriptor = descCookie.value
+        val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
         // Call getBalance from WalletService class to process logic and return balance JSON
@@ -88,7 +88,7 @@ class WalletController(val walletService: WalletService) {
             return "Wallet not found.\n"
         }
 
-        val descriptor = descCookie.value
+        val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
         // Call getNewAddress function and return a new address in string format.
@@ -107,7 +107,7 @@ class WalletController(val walletService: WalletService) {
             return "Wallet not found.\n"
         }
 
-        val descriptor = descCookie.value
+        val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
         // Call getTransactions from WalletService class to process logic and return list of transactions in JSON format
@@ -128,7 +128,7 @@ class WalletController(val walletService: WalletService) {
             return "Wallet not found.\n"
         }
 
-        val descriptor = descCookie.value
+        val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
         return walletService.createUnsignedPSBT(descriptor, network, recipient, amount, fee_rate)
@@ -146,7 +146,7 @@ class WalletController(val walletService: WalletService) {
             return "Wallet not found.\n"
         }
 
-        val descriptor = descCookie.value
+        val descriptor = walletService.decodeBase64(descCookie.value)
         val network = networkCookie.value
 
         println("payload: \n$payload")
@@ -164,6 +164,7 @@ class WalletController(val walletService: WalletService) {
             cookie.isHttpOnly = true
             // set cookie scope to "/wallet"
             cookie.path = "/wallet"
+
             response.addCookie(cookie)
         }
     }

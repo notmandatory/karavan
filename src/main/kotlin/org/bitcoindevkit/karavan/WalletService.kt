@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.stereotype.Service
 import com.fasterxml.jackson.module.kotlin.*
 import org.bitcoindevkit.*
+import java.util.*
+import kotlin.Comparator
 
 
 @Service
@@ -17,8 +19,6 @@ class WalletService {
         BlockchainConfig.Electrum(
             ElectrumConfig(electrumURL, null, 5u, null, 10u)
         )
-
-    private lateinit var encryptedPSBT : String
 
     // Create null object of type BdkProgress
     // update() function is changed to do nothing
@@ -126,9 +126,7 @@ class WalletService {
         val wallet = Wallet(descriptor, null, network, db, client)
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
         val psbt = PartiallySignedBitcoinTransaction(wallet, recipient, amount, feeRate)
-        val psbtSerialized = psbt.serialize()
-        encryptedPSBT = psbtSerialized
-        return psbtSerialized
+        return psbt.serialize()
     }
 
     fun broadcastSignedPSBT(descriptor: String, networkIn: String, psbtSerialized: String) : String {
@@ -141,17 +139,24 @@ class WalletService {
             return "Invalid Network: $networkIn!"
 
         val wallet = Wallet(descriptor, null, network, db, client)
-        //val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
-        //wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-        println("Encrypted PSBT: \n$encryptedPSBT")
-        val psbt = PartiallySignedBitcoinTransaction.deserialize(encryptedPSBT)
 
-        wallet.sign(psbt)
+        val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
+        //wallet.sign(psbt)
 
         val transaction = wallet.broadcast(psbt)
 
         // map transaction of Transaction type into JSON using Jackson and return it
         val mapper = jacksonObjectMapper()
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transaction)
+    }
+
+    // Decode base64 string into normal string
+    fun decodeBase64(stringIn: String) : String {
+        return  String(Base64.getDecoder().decode(stringIn))
+    }
+
+    // Encode normal string into base64 string
+    fun encodeBase64(stringIn: String) : String {
+        return Base64.getEncoder().encodeToString(stringIn.toByteArray())
     }
 }
