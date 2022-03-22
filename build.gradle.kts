@@ -27,13 +27,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.bitcoindevkit:bdk-jvm:0.4.0")
     implementation ("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation ("io.mockk:mockk:1.9.3")
+    implementation("org.bitcoindevkit:bdk-jvm:0.4.0")
 }
 
 tasks.withType<KotlinCompile> {
