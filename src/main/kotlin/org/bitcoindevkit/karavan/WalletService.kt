@@ -12,8 +12,8 @@ import kotlin.Comparator
 @Service
 class WalletService {
 
+    // Configuration for Electrum Network
     private val db = DatabaseConfig.Memory("")
-    // Connecting to Electrum network
     private val electrumURL = "ssl://electrum.blockstream.info:60002"
     private val client =
         BlockchainConfig.Electrum(
@@ -26,6 +26,7 @@ class WalletService {
         override fun update(progress: Float, message: String?) {}
     }
 
+    // Comparator for type Transaction, sorting by block height
     private val transactionCompByHeight =  Comparator<Transaction> { a, b ->
         val aHeight = when(a) {
             is Transaction.Confirmed -> a.confirmation.height
@@ -39,22 +40,18 @@ class WalletService {
     }
 
 
-    // Connect to Electrum network, sync wallet, and return balance as JSON
+    // Return wallet balance into JSON object
     fun getBalance(descriptor: String, networkIn: String): String{
 
-        val network : Network
+        val network : Network = Network.valueOf(networkIn)
         val balance : ULong
 
-        // Check if valid network
-        if (networkIn.equals("TESTNET", ignoreCase = true))
-            network = Network.TESTNET
-        else
-            return "Invalid Network: $networkIn!"
-
+        // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
+
         // get the balance
         balance = wallet.getBalance()
 
@@ -67,44 +64,34 @@ class WalletService {
         return balanceJSONString
     }
 
-    // Connect to Electrum network, sync wallet, and return new address in string.
+    // Return new address for wallet
     fun getNewAddress(descriptor: String, networkIn: String): String{
 
-        val network : Network
+        val network : Network = Network.valueOf(networkIn)
         val newAddress : String
 
-        // Check if valid network
-        if (networkIn.equals("TESTNET", ignoreCase = true))
-            network = Network.TESTNET
-        else
-            return "Invalid Network: $networkIn!"
-
+        // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-        // get a new address
-        newAddress = wallet.getNewAddress()
 
-        return newAddress
+        // get a new address
+        return wallet.getNewAddress()
     }
 
     // Return list of transactions in JSON format
     fun getTransactions(descriptor: String, networkIn: String): String {
 
-        val network: Network
+        val network : Network = Network.valueOf(networkIn)
 
-        // Check if valid network
-        if (networkIn.equals("TESTNET", ignoreCase = true))
-            network = Network.TESTNET
-        else
-            return "Invalid Network: $networkIn!"
-
+        // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
 
         // sync balance of descriptor
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
-        // get transactions
+
+        // get transactions and sort by block height
         val transactionList = wallet.getTransactions()
         val transactionSorted = transactionList.sortedWith(transactionCompByHeight)
 
@@ -115,36 +102,26 @@ class WalletService {
 
     fun createUnsignedPSBT(descriptor: String, networkIn: String, recipient: String, amount: ULong, feeRate: Float?) : String {
 
-        val network: Network
-        // Check if valid network
-        if (networkIn.equals("TESTNET", ignoreCase = true))
-            network = Network.TESTNET
-        else
-            return "Invalid Network: $networkIn!"
+        val network : Network = Network.valueOf(networkIn)
 
-
+        // Set up bdk::wallet object and sync wallet before spending
         val wallet = Wallet(descriptor, null, network, db, client)
         wallet.sync(progressUpdate = NullProgress, maxAddressParam = null)
+
+        // Create PSBT object and return it serialized
         val psbt = PartiallySignedBitcoinTransaction(wallet, recipient, amount, feeRate)
         return psbt.serialize()
     }
 
     fun broadcastSignedPSBT(descriptor: String, networkIn: String, psbtSerialized: String) : String {
 
-        val network: Network
-        // Check if valid network
-        if (networkIn.equals("TESTNET", ignoreCase = true))
-            network = Network.TESTNET
-        else
-            return "Invalid Network: $networkIn!"
+        val network : Network = Network.valueOf(networkIn)
 
+        // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
 
-        println("PSBT Serialized: \n$psbtSerialized")
-
+        // Deserialize PSBT object and broadcast, PSBT must be signed by all relevant parties before broadcasting
         val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
-        wallet.sign(psbt)
-
         val transaction = wallet.broadcast(psbt)
 
         // map transaction of Transaction type into JSON using Jackson and return it
