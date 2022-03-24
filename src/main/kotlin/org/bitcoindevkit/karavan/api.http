@@ -2,15 +2,15 @@
 curl -j -b /tmp/cookie-jar.txt -c /tmp/cookie-jar.txt -X PUT --location "http://localhost:8080/wallet" \
     -H "Content-Type: application/json" \
     -d "{
-          \"network\": \"testnet\",
-          \"descriptor\": \"wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)\"
+          \"network\": \"\",
+          \"descriptor\": \"\"
         }"
 ###
 PUT http://localhost:8080/wallet
 Content-Type: application/json
 
 {
-  "network": "testnet",
+  "network": "TESTNET",
   "descriptor": "d3NoKG11bHRpKDIsWzI2MmFjYjViLzg0Jy8xJy8wJy8wXXRwdWJERWRmczhDcWpqWTJmS052akhnZVY3c0JWUmlWaDZKalV4cHB1VDlORVBHbkxDMlZxcTVLSlFYM3pUbXhVQ01iWWQ1R1FIeXBadlRyN0N5R1BUUnJaeXBYQ0JSRkpGaDdIWlJQZGlUTVRMZS8qLFs4ZTk4YTYwOS84NCcvMScvMCcvMF10cHViREZEV1NvelZKcWhmU2I0NWJzYjlzQ21EeWJpOU5nZ003NlZXY0hOUGtGZUUzNDY3Y0F4VFZFZHN5dHBYVU5HN1RoV21OcTc0Tmk3eXZZeWc2MW1qeEE0and3RlJTSHdDeGF3bVpUd0VHaVAvKixbZTBhOTljOWUvODQnLzEnLzAnLzBddHB1YkRFZXdpZThnQzlCWXpDd1c1M1B4aDUxU1FmTDI4VXJSa2F0aVJmWnh3ZnVlYTI0MWlMNEFNTDNpWXBZUGo1dGdCYkU2enlMZ3M1eHRFSDI5aHp3VGpQejg3aUVpTTVNZXBBc05HVXpwRXRlLyopKSN2YXl4dmZlcA=="
 }
 
@@ -35,13 +35,11 @@ curl -b /tmp/cookie-jar.txt -X GET --location "http://localhost:8080/wallet/tran
 GET http://localhost:8080/wallet/transactions
 
 ###
-GET http://localhost:8080/wallet/transaction?recipient=tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt&amount=10000&fee_rate=4
+GET http://localhost:8080/wallet/transaction?recipient=tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt&amount=14900&fee_rate=2
 
 ###
 PUT http://localhost:8080/wallet/broadcast
 Content-Type: text/plain
-
-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
 
 
 
