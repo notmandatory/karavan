@@ -37,3 +37,6 @@ local.properties
 
 ### VS Code ###
 .vscode/
+
+/github-requester/node_modules
+/node_modules
