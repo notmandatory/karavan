@@ -2,7 +2,10 @@ package org.bitcoindevkit.karavan
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.util.WebUtils
 import java.util.*
 import java.util.stream.Collectors
@@ -17,6 +20,16 @@ class Karavan
 
 fun main(args: Array<String>) {
     runApplication<Karavan>(*args)
+}
+
+@Configuration
+class CorsConfiguration : WebMvcConfigurer { // Needed to allow requests from the frontend
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+            .allowedOrigins("http://localhost:3000")
+            .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS")
+            .allowCredentials(true)
+    }
 }
 
 @RestController
@@ -44,6 +57,7 @@ class WalletController(val walletService: WalletService) {
         else {
             // In order to delete a cookie, we must replicate it, set its maxAge to 0 and add it to response
             for(cookie in cookies) {
+                if (cookie.value == "") return "Please specify a wallet to close"
                 val cookieReplacement = Cookie(cookie.name, null)
                 cookieReplacement.path = "/wallet"
                 cookieReplacement.isHttpOnly = true
