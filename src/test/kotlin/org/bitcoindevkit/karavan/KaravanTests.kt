@@ -111,7 +111,40 @@ class KaravanTests {
         val content = result.response.contentAsString
 
         Assert.isTrue("balance" in content, "invalid balance found") // different balance for each wallet, so just check whether the response contains "balance"
+    }
 
+    //Getting the new address of invalid cookies
+    @Test
+    fun testInvalidGetNewAddress() {
+        val cookie1: Cookie = Cookie("descriptor", null)
+        val cookie2: Cookie = Cookie("network", null)
+
+        val expected = "Wallet not found.\n"
+
+        mockMVC.perform(get("/wallet/address/new")
+            .cookie(cookie1, cookie2))
+            .andExpect(status().isOk)
+            .andExpect(content().string(expected))
+            .andExpect(cookie().doesNotExist("descriptor"))
+            .andExpect(cookie().doesNotExist("network"))
+
+    }
+
+    //Getting the new address of valid cookies
+    @Test
+    fun testValidGetNewAddress() {
+        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
+        val cookie2: Cookie = Cookie("network", "testnet")
+
+        val result = mockMVC.perform(get("/wallet/address/new")
+            .cookie(cookie1,cookie2))
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val content = result.response.contentAsString
+
+        //Check that address is not empty
+        Assert.isTrue(content.isNotEmpty())
     }
 }
 
