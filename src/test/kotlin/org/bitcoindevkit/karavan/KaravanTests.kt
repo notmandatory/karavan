@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession
 import org.junit.jupiter.api.Assertions
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.test.web.servlet.request.RequestPostProcessor
+import java.util.regex.Matcher
 import javax.servlet.http.Cookie
 
 @SpringBootTest
@@ -79,6 +80,71 @@ class KaravanTests {
             .andExpect(content().string(deleteExpected))
             .andExpect(cookie().maxAge("descriptor",0)) //maxAge == 0 means the cookie is expired
             .andExpect(cookie().maxAge("network", 0))
+    }
+
+    //Getting the balance of an unexisting wallet
+    @Test
+    fun testInvalidGetBalance() {
+        val cookie1: Cookie? = Cookie("descriptor", null)
+        val cookie2: Cookie? = Cookie("network", null)
+        val expected = "Wallet not found.\n"
+
+        mockMVC.perform(get("/wallet/balance")
+            .cookie(cookie1, cookie2))
+            .andExpect(status().isOk)
+            .andExpect(content().string(expected))
+            .andExpect(cookie().doesNotExist("descriptor"))
+            .andExpect(cookie().doesNotExist("network"))
+    }
+
+    //Getting the balance of an existing wallet
+    @Test
+    fun testValidGetBalance() {
+        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
+        val cookie2: Cookie = Cookie("network", "testnet")
+
+        val result = mockMVC.perform(get("/wallet/balance")
+            .cookie(cookie1,cookie2))
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val content = result.response.contentAsString
+
+        Assert.isTrue("balance" in content, "invalid balance found") // different balance for each wallet, so just check whether the response contains "balance"
+    }
+
+    //Getting the new address of invalid cookies
+    @Test
+    fun testInvalidGetNewAddress() {
+        val cookie1: Cookie = Cookie("descriptor", null)
+        val cookie2: Cookie = Cookie("network", null)
+
+        val expected = "Wallet not found.\n"
+
+        mockMVC.perform(get("/wallet/address/new")
+            .cookie(cookie1, cookie2))
+            .andExpect(status().isOk)
+            .andExpect(content().string(expected))
+            .andExpect(cookie().doesNotExist("descriptor"))
+            .andExpect(cookie().doesNotExist("network"))
+
+    }
+
+    //Getting the new address of valid cookies
+    @Test
+    fun testValidGetNewAddress() {
+        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
+        val cookie2: Cookie = Cookie("network", "testnet")
+
+        val result = mockMVC.perform(get("/wallet/address/new")
+            .cookie(cookie1,cookie2))
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val content = result.response.contentAsString
+
+        //Check that address is not empty
+        Assert.isTrue(content.isNotEmpty())
     }
 }
 
