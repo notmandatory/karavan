@@ -5,3 +5,5 @@ export ALICE_SIGNED_PSBT=$(bdk-cli wallet -w alice -d $ALICE_SIGNING_DESCRIPTOR 
 
 # BOB SIGNS
 export ALICE_BOB_SIGNED_PSBT=$(bdk-cli wallet -w bob -d $BOB_SIGNING_DESCRIPTOR sign --psbt $ALICE_SIGNED_PSBT | jq -r ".psbt")
+
+echo done!

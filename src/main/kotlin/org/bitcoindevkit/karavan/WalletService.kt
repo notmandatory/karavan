@@ -13,7 +13,7 @@ import kotlin.Comparator
 class WalletService {
 
     // Configuration for Electrum Network
-    private val db = DatabaseConfig.Memory("")
+    private val db = DatabaseConfig.Memory
     private val electrumURL = "ssl://electrum.blockstream.info:60002"
     private val client =
         BlockchainConfig.Electrum(
@@ -68,7 +68,6 @@ class WalletService {
     fun getNewAddress(descriptor: String, networkIn: String): String{
 
         val network : Network = Network.valueOf(networkIn)
-        val newAddress : String
 
         // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
@@ -120,13 +119,12 @@ class WalletService {
         // Set up bdk::wallet object
         val wallet = Wallet(descriptor, null, network, db, client)
 
-        // Deserialize PSBT object and broadcast, PSBT must be signed by all relevant parties before broadcasting
+        // Deserialize PSBT o bject and broadcast, PSBT must be signed by all relevant parties before broadcasting
         val psbt = PartiallySignedBitcoinTransaction.deserialize(psbtSerialized)
-        val transaction = wallet.broadcast(psbt)
 
-        // map transaction of Transaction type into JSON using Jackson and return it
-        val mapper = jacksonObjectMapper()
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transaction)
+        val txid = wallet.broadcast(psbt)
+
+        return "https://mempool.space/testnet/tx/$txid"
     }
 
     // Decode base64 string into normal string
