@@ -136,4 +136,10 @@ class WalletService {
     fun encodeBase64(stringIn: String) : String {
         return Base64.getEncoder().encodeToString(stringIn.toByteArray())
     }
+
+    // If descriptor or network is invalid, this code will throw an exception
+    fun validateDescriptor(descriptor: String, networkIn: String) {
+        val network : Network = Network.valueOf(networkIn)
+        val wallet = Wallet(descriptor, null, network, db, client)
+    }
 }

@@ -1,5 +1,6 @@
 package org.bitcoindevkit.karavan
 
+import org.bitcoindevkit.Network
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Configuration
@@ -40,10 +41,15 @@ class WalletController(val walletService: WalletService) {
     @PutMapping
     fun openWallet(response: HttpServletResponse, request: HttpServletRequest, @RequestBody payload: Wallet): String? {
 
-        // @TODO need to validate input here for network and descriptor before storing them into cookie
+        // Validate Descriptor and Network before storing in cookie
+        walletService.validateDescriptor(walletService.decodeBase64(payload.descriptor), payload.network)
+
+        // *** If no exception is thrown in the code above, execution will continue here ***
+
         // stores payload of type wallet into a cookie
         setCookie(response, payload)
         return "Wallet is opened!\n"
+
     }
 
     // Close wallet by dropping existing descriptor cookie
