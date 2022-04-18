@@ -35,7 +35,10 @@ class KaravanTests {
     @Autowired
     lateinit var webApplicationContext: WebApplicationContext
     lateinit var mockMVC: MockMvc
-    val wallet = "{\"network\": \"testnet\",\"descriptor\": \"wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)\"}"
+    val invalidCookie1: Cookie? = Cookie("descriptor", null)
+    val invalidCookie2: Cookie? = Cookie("network", null)
+    val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
+    val cookie2: Cookie = Cookie("network", "testnet")
 
     @BeforeEach
     fun initialize() {
@@ -71,8 +74,6 @@ class KaravanTests {
     @Test
     fun testCloseOpenWallet() {
         val deleteExpected = "Wallet is closed!\n"
-        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
-        val cookie2: Cookie = Cookie("network", "testnet")
 
         mockMVC.perform(delete("/wallet")
             .cookie(cookie1, cookie2))
@@ -85,12 +86,10 @@ class KaravanTests {
     //Getting the balance of an unexisting wallet
     @Test
     fun testInvalidGetBalance() {
-        val cookie1: Cookie? = Cookie("descriptor", null)
-        val cookie2: Cookie? = Cookie("network", null)
         val expected = "Wallet not found.\n"
 
         mockMVC.perform(get("/wallet/balance")
-            .cookie(cookie1, cookie2))
+            .cookie(invalidCookie1, invalidCookie2))
             .andExpect(status().isOk)
             .andExpect(content().string(expected))
             .andExpect(cookie().doesNotExist("descriptor"))
@@ -100,9 +99,6 @@ class KaravanTests {
     //Getting the balance of an existing wallet
     @Test
     fun testValidGetBalance() {
-        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
-        val cookie2: Cookie = Cookie("network", "testnet")
-
         val result = mockMVC.perform(get("/wallet/balance")
             .cookie(cookie1,cookie2))
             .andExpect(status().isOk)
@@ -116,13 +112,10 @@ class KaravanTests {
     //Getting the new address of invalid cookies
     @Test
     fun testInvalidGetNewAddress() {
-        val cookie1: Cookie = Cookie("descriptor", null)
-        val cookie2: Cookie = Cookie("network", null)
-
         val expected = "Wallet not found.\n"
 
         mockMVC.perform(get("/wallet/address/new")
-            .cookie(cookie1, cookie2))
+            .cookie(invalidCookie1, invalidCookie2))
             .andExpect(status().isOk)
             .andExpect(content().string(expected))
             .andExpect(cookie().doesNotExist("descriptor"))
@@ -133,9 +126,6 @@ class KaravanTests {
     //Getting the new address of valid cookies
     @Test
     fun testValidGetNewAddress() {
-        val cookie1: Cookie = Cookie("descriptor", "wpkh([1f44db3b/84'/1'/0'/0]tpubDEtS2joSaGheeVGuopWunPzqi7D3BJ9kooggvasZWUzSVziMNKkrdfS7VnLDe6M4Cg6bw3j5oxRB5U7GMJGcFnDia6yUaFAdwWqyJQjn4Qp/0/*)")
-        val cookie2: Cookie = Cookie("network", "testnet")
-
         val result = mockMVC.perform(get("/wallet/address/new")
             .cookie(cookie1,cookie2))
             .andExpect(status().isOk)
@@ -145,6 +135,34 @@ class KaravanTests {
 
         //Check that address is not empty
         Assert.isTrue(content.isNotEmpty())
+    }
+
+    //Getting the transactions of invalid cookies
+    @Test
+    fun testInvalidGetTransactions() {
+        val expected = "Wallet not found.\n"
+
+        mockMVC.perform(get("/wallet/transactions")
+            .cookie(invalidCookie1, invalidCookie2))
+            .andExpect(status().isOk)
+            .andExpect(content().string(expected))
+            .andExpect(cookie().doesNotExist("descriptor"))
+            .andExpect(cookie().doesNotExist("network"))
+    }
+
+    //Getting the transactions of valid cookies
+    @Test
+    fun testValidGetTransactions() {
+        val result = mockMVC.perform(get("/wallet/transactions")
+            .cookie(cookie1,cookie2))
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val content = result.response.contentAsString
+
+        //check that the transactions are not empty
+        Assert.isTrue(content.isNotEmpty())
+
     }
 }
 
