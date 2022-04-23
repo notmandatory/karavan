@@ -10,4 +10,4 @@ This will add the dependencies required to run the project.
 
 This will start the project.
 
-Note: Yarn runs the project better, because it can lock the resources while you edit your pages.
+Note: If npm gives your errors, run "sudo npm install --global yarn" (if you don't already have yarn) -> "yarn" -> "yarn start"
