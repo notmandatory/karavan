@@ -1,0 +1,8 @@
+@font-face {
+        font-family: "roboto-700";
+        src: url("./assets/fonts/roboto-700.ttf") format("truetype");
+      }
+@font-face {
+        font-family: "helvetica-regular";
+        src: url("./assets/fonts/helvetica-regular.ttf") format("truetype");
+      }
