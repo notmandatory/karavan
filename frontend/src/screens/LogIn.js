@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import styled, { css } from "styled-components";
 import DescriptorInputBox from "../components/DescriptorInputBox";
 import NetworkTextBox from "../components/NetworkTextBox";
+import { Link } from "react-router-dom";
 import LogInButton from "../components/LogInButton";
 import Select from 'react-select'
 
 function LogIn(props) {
 
-    const networkOptions = [
+   const networkOptions = [
         { value: 'TESTNET', label: 'Testnet' },
         { value: 'BITCOIN', label: 'Bitcoin' },
         { value: 'REGTEST', label: 'Regtest' }
@@ -32,6 +33,11 @@ function LogIn(props) {
                 }}
               ></DescriptorInputBox>
               <Select options={networkOptions} />
+              <Link to="/Dashboard">
+                <Button>
+                  <ButtonOverlay></ButtonOverlay>
+                </Button>
+              </Link>
               <LogInButton
                 style={{
                   height: 53,
@@ -55,6 +61,13 @@ const Container = styled.div`
   width: 100vw;
 `;
 
+const ButtonOverlay = styled.button`
+ display: block;
+ background: none;
+ height: 100%;
+ width: 100%;
+ border:none
+ `;
 const Background = styled.div`
   background-color: rgba(0,0,0,1);
   elevation: 0px;
@@ -115,7 +128,18 @@ const InputGroup = styled.div`
   justify-content: space-between;
   margin-top: 52px;
   margin-left: 31px;
+  position: relative;
   display: flex;
+`;
+
+const Button = styled.div`
+  top: 252px;
+  left: 22px;
+  width: 345px;
+  height: 51px;
+  position: absolute;
+  opacity: 0;
+  border: none;
 `;
 
 export default LogIn;
