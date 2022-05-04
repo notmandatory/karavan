@@ -40,3 +40,6 @@ local.properties
 
 /github-requester/node_modules
 /node_modules
+
+*.hprof.*
+*.hprof
