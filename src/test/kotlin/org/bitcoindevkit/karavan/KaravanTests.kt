@@ -21,8 +21,6 @@ class KaravanTests {
     @Autowired
     lateinit var webApplicationContext: WebApplicationContext
     lateinit var mockMVC: MockMvc
-    //val invalidCookie1: Cookie? = Cookie("descriptor", null)
-    //val invalidCookie2: Cookie? = Cookie("network", null)
     val cookie1: Cookie = Cookie("descriptor", "d3NoKG11bHRpKDIsWzI3Mjk1Yjk4Lzg0Jy8xJy8wJy8wXXRwdWJERjZNSGhoaHJXVUx5Y1BGTU05UmkzRHFBYVpVZ3ROMTlOdWY1Y1Z6NVhWVG5xcWlUNTZCV0ZuZlA5ZW01UjUyNmdDSmpRVTY4Nnc3NzhLNVJqaFpmeHRNWmg3N1dETWYxcllVNnpTU3lxMy8qLFs3NzYwNjAzOC84NCcvMScvMCcvMF10cHViREVqVTFLS2JMQzNpTDgyaUg5RnFOZ2o3bmtEVFdOWDk2a3Q2dlBTTVk0a2dkWFVneVR3ZGVhTmZDQlJqQlhCaWtINHRSRW1mNTkxMkFUZ1JuYmZpVUpvcXBTcXFnSnR5NVhUOTlFQmRqNWkvKixbMGQ5MDM3ODIvODQnLzEnLzAnLzBddHB1YkRGMUF4OWMxNXVGNkRMNnJ1RnJ1a0dnTlNvZUtzdFZ1NzhrdFNFQTVDSEtib3FMRmQxRnFaTXBuQjNySGR2NUFUbnhlclN0NlRQTlUxemE1TDVhaDRwVkZGcDdDcGg4c0tIWDZvVlNHMVNrLyopKSN1ZHZ3OGgydg==")
     val cookie2: Cookie = Cookie("network", "TESTNET")
 
@@ -133,7 +131,7 @@ class KaravanTests {
     fun testBroadcast() {
         lateinit var msg: String
 
-        // To do: Resolve error: empty witness RPC Error: -26
+        //To do : Resolve errors: empty witness RPC Error: -26 / Transaction already in blockchain
         try {
             val result = mockMVC.perform(put("/wallet/broadcast")
                 .contentType(MediaType.TEXT_PLAIN)
@@ -146,10 +144,6 @@ class KaravanTests {
             msg = e.message.toString()
             Assert.isTrue( "Transaction already in block chain" in msg, "Broadcast failed")
         }
-
-//        val content = result.response.contentAsString
-
-
 
     }
 }

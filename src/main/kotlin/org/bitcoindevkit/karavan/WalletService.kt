@@ -8,7 +8,9 @@ import org.bitcoindevkit.*
 import java.util.*
 import kotlin.Comparator
 
-
+/**
+ * Service class for the SpringBoot Project
+ */
 @Service
 class WalletService {
 
@@ -39,8 +41,10 @@ class WalletService {
         compareValues(aHeight,bHeight)
     }
 
-
-    // Return wallet balance into JSON object
+    /**
+     * Returns wallet balance into JSON object
+     * @see WalletController.getBalance
+     */
     fun getBalance(descriptor: String, networkIn: String): String{
 
         val network : Network = Network.valueOf(networkIn)
@@ -64,7 +68,10 @@ class WalletService {
         return balanceJSONString
     }
 
-    // Return new address for wallet
+    /**
+     * Returns new address for wallet
+     * @see WalletController.getNewAddress
+     */
     fun getNewAddress(descriptor: String, networkIn: String): String{
 
         val network : Network = Network.valueOf(networkIn)
@@ -79,7 +86,10 @@ class WalletService {
         return wallet.getNewAddress()
     }
 
-    // Return list of transactions in JSON format
+    /**
+     * Returns list of transactions in JSON format
+     * @see WalletController.getTransactions
+     */
     fun getTransactions(descriptor: String, networkIn: String): String {
 
         val network : Network = Network.valueOf(networkIn)
@@ -99,6 +109,10 @@ class WalletService {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(transactionSorted)
     }
 
+    /**
+     * Creates partially signed bitcoin transaction for the wallet.
+     * @see WalletController.createPSBT
+     */
     fun createUnsignedPSBT(descriptor: String, networkIn: String, recipient: String, amount: ULong, feeRate: Float?) : String {
 
         val network : Network = Network.valueOf(networkIn)
@@ -112,6 +126,10 @@ class WalletService {
         return psbt.serialize()
     }
 
+    /**
+     * Broadcasts the signed transaction to the global bitcoin blockchain
+     * @see WalletController.broadcast
+     */
     fun broadcastSignedPSBT(descriptor: String, networkIn: String, psbtSerialized: String) : String {
 
         val network : Network = Network.valueOf(networkIn)
@@ -127,17 +145,28 @@ class WalletService {
         return "https://mempool.space/testnet/tx/$txid"
     }
 
-    // Decode base64 string into normal string
+    /**
+     * Decodes base64 string into normal string
+     * @param stringIn A base64 string
+     * @return normal String that is to was decoded from the base64 string
+     */
     fun decodeBase64(stringIn: String) : String {
         return  String(Base64.getDecoder().decode(stringIn))
     }
 
-    // Encode normal string into base64 string
+    /**
+     *  Encodes normal string into base64 string
+     *  @param stringIn A normal string
+     *  @return A base65 string that was transformed from the normal version
+     */
     fun encodeBase64(stringIn: String) : String {
         return Base64.getEncoder().encodeToString(stringIn.toByteArray())
     }
 
-    // If descriptor or network is invalid, this code will throw an exception
+    /**
+     * Validates descriptor and network
+     * @throws BdkException if either is invalid
+     */
     fun validateDescriptor(descriptor: String, networkIn: String) {
         val network : Network = Network.valueOf(networkIn)
         val wallet = Wallet(descriptor, null, network, db, client)
