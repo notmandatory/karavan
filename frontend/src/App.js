@@ -4,6 +4,8 @@ import "./icons.js";
 import Dashboard from "./screens/Dashboard";
 import LogIn from "./screens/LogIn";
 import "./style.css";
+import 'antd/dist/antd.css';
+import './index.css';
 
 function App() {
   return (

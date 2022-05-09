@@ -1,56 +1,96 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import styled, { css } from "styled-components";
 import DescriptorInputBox from "../components/DescriptorInputBox";
 import NetworkTextBox from "../components/NetworkTextBox";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import LogInButton from "../components/LogInButton";
 import Select from 'react-select'
+import axios from "axios";
+import {decode as base64_decode, encode as base64_encode} from 'base-64';
 
 function LogIn(props) {
 
-   const networkOptions = [
+    const history = useHistory();
+
+    const [network, setNetwork] = useState(null)
+    const [descriptor, setDescriptor] = useState(null)
+
+    // open wallet request function
+    function openWallet () {
+
+        let encodedDescriptor = base64_encode(descriptor);
+
+        const data = {
+            "network": network,
+            "descriptor": "d3NoKG11bHRpKDIsWzBkYzYxNjcyLzg0Jy8xJy8wJy8wXXRwdWJERW4yaExOMWtYYXRleHpnN3djTTFGRDdXVU5aUUR5UEhTdFZ3Z1BnOG4zeUc2UW5CTHRSRFEyYk5hWGg4dkxCODZRcTh2TkwzYkR3M2RpRkNxS3dWbUVUclhzVlJYQUEzTnRyTkFwbWNCdS8qLFthNDIwMjk3OS84NCcvMScvMCcvMF10cHViREZHblFmRWNmQ25yaWpEeFVlRW5tZ1JHd1A1SG5CcGd1RDUyR25kWVNSNTRFU1V2ZHR0elpYTHFHdk14aE1tMXlwR3JrRGFpUUtpb2lIRzhSaVpjWnM2S2R1R1huTWJaOVZNMXltTGNLTFovKixbMGJhM2I3Y2EvODQnLzEnLzAnLzBddHB1YkRGVGR5Y1dzTVZnb2JQVUJSTTlaZzNiUDlKblR4dDZCYW40OXhUNmJvYjJwNmZtdEVQUDI3ZFR4S21wUmJ6UzhGV3BpN3AxRXN2Z2pxMWdvSHBUcW54V1ZCV2hjQlZyN2NFdnF5dUc4THpFLyopKSM3eHQ0anIzZQ=="
+            // "descriptor": encodedDescriptor
+        }
+
+        console.log(data)
+        axios.put('http://localhost:8080/wallet', data, {withCredentials: true}).then(response => console.log(response))
+
+        history.push("/Dashboard");
+
+
+    }
+
+    const networkOptions = [
         { value: 'TESTNET', label: 'Testnet' },
         { value: 'BITCOIN', label: 'Bitcoin' },
         { value: 'REGTEST', label: 'Regtest' }
     ]
 
-  return (
-    <Container>
-      <Background>
-        <LogInModule>
-          <Rect>
-            <Karavan>karavan</Karavan>
-            <SignIn>Sign In</SignIn>
-            <InputGroup>
-              <DescriptorInputBox
-                style={{
-                  height: 61,
-                  width: 388,
-                  borderWidth: 0,
-                  borderColor: "rgba(255,255,255,1)",
-                  borderStyle: "solid",
-                  borderBottomWidth: 1
-                }}
-              ></DescriptorInputBox>
-              <Select options={networkOptions} />
-              <Link to="/Dashboard">
-                <Button>
-                  <ButtonOverlay></ButtonOverlay>
-                </Button>
-              </Link>
-              <LogInButton
-                style={{
-                  height: 53,
-                  width: 350,
-                  alignSelf: "center"
-                }}
-              ></LogInButton>
-            </InputGroup>
-          </Rect>
-        </LogInModule>
-      </Background>
-    </Container>
-  );
+    function handleInputChange(e) {
+        console.log("inputChange")
+        console.log(e.target.value)
+        setDescriptor(e.target.value)
+    }
+
+    function handleSelectChange(e) {
+        console.log("selectChange")
+        console.log(e.value)
+        setNetwork(e.value)
+    }
+
+    return (
+        <Container>
+            <Background>
+                <LogInModule>
+                    <Rect>
+                        <Karavan>karavan</Karavan>
+                        <SignIn>Sign In</SignIn>
+                        <InputGroup>
+                            <DescriptorInputBox
+                                onChange={handleInputChange}
+                                style={{
+                                    height: 61,
+                                    width: 388,
+                                    borderWidth: 0,
+                                    borderColor: "rgba(255,255,255,1)",
+                                    borderStyle: "solid",
+                                    borderBottomWidth: 1
+                                }}
+                            ></DescriptorInputBox>
+                            <Select options={networkOptions} onChange={handleSelectChange}/>
+                            {/*<Link to="/Dashboard">*/}
+                            {/*  <Button >*/}
+                            {/*    <ButtonOverlay></ButtonOverlay>*/}
+                            {/*  </Button>*/}
+                            {/*</Link>*/}
+                            <LogInButton
+                                style={{
+                                    height: 53,
+                                    width: 350,
+                                    alignSelf: "center"
+                                }}
+                                onClick={openWallet}
+                            ></LogInButton>
+                        </InputGroup>
+                    </Rect>
+                </LogInModule>
+            </Background>
+        </Container>
+    );
 }
 
 const Container = styled.div`
