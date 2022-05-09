@@ -69,7 +69,7 @@ class WalletController(val walletService: WalletService) {
 
     }
 
-    // @TODO see why cookie is not closing properly.
+
     /**
      *  Closes wallet by dropping existing descriptor cookie
      *  @param request A HttpServeltRequest that contains cookies
@@ -161,7 +161,7 @@ class WalletController(val walletService: WalletService) {
         }
     }
 
-    // @TODO Create a function to validate parameter values
+
     /**
      * Creates partially signed bitcoin transaction for the wallet
      * @param request A HttpServletRequest that contains cookies

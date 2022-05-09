@@ -19,14 +19,14 @@ function Dashboard(props) {
 
     const history = useHistory();
 
-    const [balance, setBalance] = useState(0)
+    const [balance, setBalance] = useState(5315)
     const [data, setData] = useState(null)
 
-    const [myAddress, setMyAddress] = useState("tb1q0fsteqef9aydnmgtg4sefh9nrskfzcafc5r2nwy9tq43n2g0mp9snhram2")
+    const [myAddress, setMyAddress] = useState("tb1qvqjvm5z0c8z7239q5rpexgc4krjdtz3xjsedetx9zuzya8lg3dxsjqx2ph")
 
     const [address, setAddress] = useState("tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt")
-    const [amount, setAmount] = useState(null)
-    const [feeRate, setFeeRate] = useState(null)
+    const [amount, setAmount] = useState(4500)
+    const [feeRate, setFeeRate] = useState(1)
 
     const [refresh, setRefresh] = useState(false)
 
@@ -99,13 +99,13 @@ function Dashboard(props) {
     function handleAmountChange(e) {
         console.log("amountChange")
         console.log(e.target.value)
-        setAmount(e.target.value)
+        //setAmount(e.target.value)
     }
 
     function handleFeeRateChange(e) {
         console.log("feeRateChange")
         console.log(e.target.value)
-        setFeeRate(e.target.value)
+        //setFeeRate(e.target.value)
     }
 
     function handlePSBT(e) {
@@ -129,8 +129,8 @@ function Dashboard(props) {
 
         console.log("createTransaction")
         //`http://localhost:8080/wallet/transaction/?recipient=tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt&amount=4500&fee_rate=1`
-        //`http://localhost:8080/wallet/transaction/?recipient=tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt&amount=4500&fee_rate=1`
-        axios.get(`http://localhost:8080/wallet/transaction/?recipient=${address}&amount=${amount}&fee_rate=${feeRate}`, {withCredentials: true}).then(response => setPSBT(response.data))
+        axios.get('http://localhost:8080/wallet/transaction/?recipient=tb1ql7w62elx9ucw4pj5lgw4l028hmuw80sndtntxt&amount=4500&fee_rate=1', {withCredentials: true}).then(response => setPSBT(response.data))
+        //axios.get(`http://localhost:8080/wallet/transaction/?recipient=${address}&amount=${amount}&fee_rate=${feeRate}`, {withCredentials: true}).then(response => setPSBT(response.data))
 
     }
 
@@ -164,7 +164,7 @@ function Dashboard(props) {
             <BalanceModuleRow>
                 <BalanceModule>
                     <BalanceLabel>Balance</BalanceLabel>
-                    <Balance>{`${balance} sats`}</Balance>
+                    <Balance>{`${balance} sat`}</Balance>
                     <RefreshButton
                         style={{
                             height: 56,
@@ -175,7 +175,7 @@ function Dashboard(props) {
                         onClick={getBalance}
                     ></RefreshButton>
                     <YourAddressOutput>
-                        {`Your Address:${myAddress}`}
+                        {`Your Address: ${myAddress}`}
                     </YourAddressOutput>
                 </BalanceModule>
                 <BtcModule>
@@ -288,7 +288,11 @@ function Dashboard(props) {
             </TransactionGroup>
 
             <TransactionGroup>
-                <Table columns={columns} dataSource={data} style={{marginTop: "0px"}}/>
+                <Table columns={columns} dataSource={data}
+                       style={{
+                           height: 900,
+                           width: 1800
+                }}/>
             </TransactionGroup>
 
         </Background>
@@ -319,7 +323,7 @@ const Karavan1 = styled.span`
   width: 118px;
   height: 39px;
   margin-left: 130px;
-  margin-top: 11px;
+  margin-top: 5px;
 `;
 
 const Karavan1Filler = styled.div`
@@ -366,7 +370,7 @@ const Balance = styled.span`
   font-weight: 400;
   color: #121212;
   font-size: 36px;
-  width: 180px;
+  
   height: 66px;
   margin-top: 26px;
   align-self: center;
